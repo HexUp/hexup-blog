@@ -56,3 +56,11 @@ const ogImage = image ? new URL(image.src, Astro.url) : undefined;
 <meta property="twitter:title" content={title} />
 <meta property="twitter:description" content={description} />
 {ogImage && <meta property="twitter:image" content={ogImage} />}
+
+<!-- Vercel Web Analytics. inject() no-ops in dev; in prod it loads the
+     tracker from /_vercel/insights/script.js (served by Vercel edge).
+     Toggle on in: Vercel project → Analytics → Web Analytics. -->
+<script>
+	import { inject } from '@vercel/analytics';
+	inject();
+</script>
