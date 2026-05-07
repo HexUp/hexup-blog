@@ -31,5 +31,16 @@ export default defineConfig({
 				],
 			},
 		},
+		{
+			provider: fontProviders.google(),
+			name: 'JetBrains Mono',
+			cssVariable: '--font-mono',
+			fallbacks: ['ui-monospace', 'SFMono-Regular', 'Menlo', 'monospace'],
+			options: {
+				weights: [400, 500, 700],
+				styles: ['normal'],
+				subsets: ['latin'],
+			},
+		},
 	],
 });
