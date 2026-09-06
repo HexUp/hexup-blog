@@ -32,7 +32,12 @@
 	font-family: 'Han';
 	font-style: normal;
 	font-weight: 400;
-	src: local('Songti SC'), local('STSongti-SC-Regular');
+	src:
+		local('Songti SC'), local('STSongti-SC-Regular'),
+		/* iOS 没有 Songti SC（Apple 官方字体表标注 macOS only），落到 PingFang。
+		   显式写出来，是为了让「iOS 上是无衬线」成为一个决定，而不是 fallback
+		   碰巧的结果。 */
+		local('PingFang SC'), local('PingFangSC-Regular');
 	unicode-range:
 		U+2E80-2EFF, U+2F00-2FDF, U+3000-303F, U+3040-30FF, U+3100-312F, U+3190-319F,
 		U+31C0-31EF, U+3200-33FF, U+3400-4DBF, U+4E00-9FFF, U+F900-FAFF, U+FE10-FE1F,
@@ -45,7 +50,11 @@
 	font-family: 'Han';
 	font-style: normal;
 	font-weight: 700;
-	src: local('STSongti-SC-Black'), local('Songti SC Black'), local('Songti SC');
+	src:
+		local('STSongti-SC-Black'), local('Songti SC Black'), local('Songti SC'),
+		/* PingFang 没有 Black 面，也没有「换黑体」的传统，封顶 Semibold——
+		   FaceTable.swift 里 pingfangSC 那一行就是这么处理的。 */
+		local('PingFangSC-Semibold'), local('PingFang SC');
 	unicode-range:
 		U+2E80-2EFF, U+2F00-2FDF, U+3000-303F, U+3040-30FF, U+3100-312F, U+3190-319F,
 		U+31C0-31EF, U+3200-33FF, U+3400-4DBF, U+4E00-9FFF, U+F900-FAFF, U+FE10-FE1F,
@@ -95,6 +104,10 @@
 	/* Telari 的 latin role 默认是系统衬线体，即 macOS 的 New York。ui-serif 在
 	   Apple 平台上解析到的正是它。 */
 	--font-latin: ui-serif, 'New York', Iowan Old Style, Georgia, serif;
+	/* 没有中文衬线体时的西文栈：PingFang 是无衬线，配 New York 就又变成
+	   「两套字体临时拼在一起」了。SF 是 iOS 上与 PingFang 原生搭配的那一款。 */
+	--font-latin-sans: -apple-system, BlinkMacSystemFont, ui-sans-serif, system-ui,
+		'Segoe UI', Roboto, sans-serif;
 	/* 阅读字体栈：拉丁在前，'Han' 只接管它覆盖不到的码位。 */
 	--font-reading: var(--font-latin), 'Han', serif;
 
@@ -227,3 +240,22 @@ code {
 .prose li {
 	hanging-punctuation: allow-end;
 }
+
+/* ---------------------------------------------------------------------------
+   5. 没有中文衬线体的设备（iOS）
+
+   BaseHead 里的内联脚本探测 Songti SC 是否可用，不可用就在 <html> 上打
+   `no-han-serif`。此时中文走 PingFang（无衬线），西文也跟着换成 SF——两边
+   同时换，才不会一边衬线一边无衬线。这正是文章里那句「看起来像同一段文字，
+   而不是两套字体临时拼在一起」。
+
+   探测失败（脚本被拦、canvas 不可用）时什么都不加，退回衬线栈；Mac 上正确，
+   iOS 上退化成当前这种混搭，不会更差。
+--------------------------------------------------------------------------- */
+
+:root.no-han-serif {
+	--font-latin: var(--font-latin-sans);
+}
+
+/* 无衬线路径上 em 没有可换的中文字面（楷体在 iOS 上同样不预装），中文强调
+   因此没有视觉区别。不要在这里补 font-style: italic —— 见 CLAUDE.md。 */

@@ -34,6 +34,33 @@ const ogImage = image ? new URL(image.src, Astro.url) : undefined;
 />
 <meta name="generator" content={Astro.generator} />
 
+<!-- 中文衬线体探测。必须在首次绘制前跑完，所以内联在 head 里，不要挪走。
+
+     关键：**必须用拉丁串量，不能用汉字**。所有中文字体的汉字都是标准的
+     1em 全角宽，两款不同的中文字体量出来一模一样，区分不了。宋体自带一套
+     西文字形，宽度与 monospace 不同，所以拿 'MMMWWWiiil' 在
+     「Songti SC + monospace」与「monospace」下各量一次：相等就说明
+     Songti SC 没匹配上，走无衬线路径。
+
+     document.fonts.check() 在这里没用——对根本不存在的字体族也返回 true。 -->
+<script is:inline>
+	(function () {
+		try {
+			var ctx = document.createElement('canvas').getContext('2d');
+			if (!ctx) return;
+			var probe = 'MMMWWWiiil';
+			ctx.font = '72px monospace';
+			var base = ctx.measureText(probe).width;
+			ctx.font = '72px "Songti SC", monospace';
+			if (ctx.measureText(probe).width === base) {
+				document.documentElement.classList.add('no-han-serif');
+			}
+		} catch (e) {
+			/* 探测不了就保持衬线栈 */
+		}
+	})();
+</script>
+
 <Font cssVariable="--font-atkinson" preload />
 <Font cssVariable="--font-mono" preload />
 
