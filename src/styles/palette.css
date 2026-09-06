@@ -1,0 +1,130 @@
+/*
+  配色 — Telari Light / Telari Dark，逐槽照抄。
+
+  来源：~/projects/telari
+    app/Sources/TelariKit/Resources/document-themes/telari-light.toml
+    app/Sources/TelariKit/Resources/document-themes/telari-dark.toml
+
+  那两个文件由 tools/theme/ladder_gen.py 生成，**不要在这里手改颜色**：
+  每个值都在一组对比度约束里（正文对纸、六级代码色梯子两两 ΔL* ≥ 7.5、
+  token 对正文 ΔL* ≥ 8）。改一个值就把约束破坏了，而这里看不出来。要改色
+  回 telari 改生成器参数重跑，再把新值搬过来。
+
+  深色那套的 comment 对面色是 3.66:1，低于 4.5:1——这是 telari 那边明确记录
+  过的让步（那块纸上六条约束在当前排布下排不下 4.5:1），不是这里的疏漏。
+
+  三档状态：
+  - 未选择（默认）→ 跟随系统 prefers-color-scheme
+  - data-theme="light" / "dark" → 用户显式选择，压过系统
+*/
+
+:root {
+	color-scheme: light;
+
+	/* [document] */
+	--paper: #faf9f6;
+	--text: #31312f;
+	--heading: #242423;
+	--link: #006fb0;
+	--secondary-text: #7c7c7b;
+	--rule: #d8d7d4;
+	--code-block-bg: #edece9;
+	--code-capsule-bg: #e5e4e1;
+	--table-header-bg: #edece9;
+
+	/* [chrome] —— 站点框架（页眉、页脚）用，与正文区分开 */
+	--chrome-bg: #edece9;
+	--chrome-divider: #c7c6c3;
+
+	/* [document.code] —— 代码高亮六级梯子 */
+	--code-keyword: #000342;
+	--code-string: #004e36;
+	--code-comment: #616a70;
+	--code-literal: #844500;
+	--code-type: #001d4b;
+
+	/* Telari 的调色板里没有阴影槽（它画的是纸，不是卡片）。这里只有题图需要，
+	   取正文色的低透明度，跟着主题走。 */
+	--shadow: 0 1px 2px rgb(49 49 47 / 6%), 0 8px 24px rgb(49 49 47 / 8%);
+}
+
+:root[data-theme='dark'] {
+	color-scheme: dark;
+
+	--paper: #2b303a;
+	--text: #b9bbc2;
+	--heading: #e5e8ef;
+	--link: #28aaf1;
+	--secondary-text: #898b90;
+	--rule: #464b56;
+	--code-block-bg: #212630;
+	--code-capsule-bg: #323741;
+	--table-header-bg: #212630;
+
+	--chrome-bg: #212630;
+	--chrome-divider: #545964;
+
+	--code-keyword: #e4e7ff;
+	--code-string: #5eb597;
+	--code-comment: #757e84;
+	--code-literal: #c97f3d;
+	--code-type: #96dcff;
+
+	--shadow: 0 1px 2px rgb(0 0 0 / 24%), 0 8px 24px rgb(0 0 0 / 32%);
+}
+
+/* 系统深色，且用户没有显式选浅色。值必须与上面 [data-theme='dark'] 一致——
+   两处都写全，是因为「只在媒体查询里定义」的颜色在切换回浅色时无处可退。 */
+@media (prefers-color-scheme: dark) {
+	:root:not([data-theme='light']) {
+		color-scheme: dark;
+
+		--paper: #2b303a;
+		--text: #b9bbc2;
+		--heading: #e5e8ef;
+		--link: #28aaf1;
+		--secondary-text: #898b90;
+		--rule: #464b56;
+		--code-block-bg: #212630;
+		--code-capsule-bg: #323741;
+		--table-header-bg: #212630;
+
+		--chrome-bg: #212630;
+		--chrome-divider: #545964;
+
+		--code-keyword: #e4e7ff;
+		--code-string: #5eb597;
+		--code-comment: #757e84;
+		--code-literal: #c97f3d;
+		--code-type: #96dcff;
+
+		--shadow: 0 1px 2px rgb(0 0 0 / 24%), 0 8px 24px rgb(0 0 0 / 32%);
+	}
+}
+
+/* ---------------------------------------------------------------------------
+   代码高亮
+
+   Shiki 以 defaultColor: false 输出，每个 span 上挂着 --shiki-light /
+   --shiki-dark 两个值。这里按当前主题挑一个——和上面的槽用同一套三档规则。
+--------------------------------------------------------------------------- */
+
+.astro-code,
+.astro-code span {
+	color: var(--shiki-light);
+	background-color: var(--shiki-light-bg);
+}
+
+:root[data-theme='dark'] .astro-code,
+:root[data-theme='dark'] .astro-code span {
+	color: var(--shiki-dark);
+	background-color: var(--shiki-dark-bg);
+}
+
+@media (prefers-color-scheme: dark) {
+	:root:not([data-theme='light']) .astro-code,
+	:root:not([data-theme='light']) .astro-code span {
+		color: var(--shiki-dark);
+		background-color: var(--shiki-dark-bg);
+	}
+}

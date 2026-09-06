@@ -12,12 +12,29 @@ const isBlogActive = pathname === '/blog' || pathname.startsWith('/blog/');
 		</a>
 		<nav class="nav" aria-label="Primary">
 			<a href="/blog" class:list={['nav-link', { active: isBlogActive }]}>Blog</a>
+			<button
+				type="button"
+				id="theme-toggle"
+				class="theme-toggle"
+				aria-label="切换浅色 / 深色主题"
+				title="切换浅色 / 深色主题"
+			>
+				<svg class="icon icon-sun" viewBox="0 0 24 24" aria-hidden="true">
+					<circle cx="12" cy="12" r="4.2"></circle>
+					<path
+						d="M12 2.6v2.4M12 19v2.4M21.4 12H19M5 12H2.6M18.6 5.4l-1.7 1.7M7.1 16.9l-1.7 1.7M18.6 18.6l-1.7-1.7M7.1 7.1L5.4 5.4"
+					></path>
+				</svg>
+				<svg class="icon icon-moon" viewBox="0 0 24 24" aria-hidden="true">
+					<path d="M20 14.4A8.4 8.4 0 1 1 9.6 4a6.9 6.9 0 0 0 10.4 10.4Z"></path>
+				</svg>
+			</button>
 		</nav>
 	</div>
 </header>
 <style>
 	header {
-		border-bottom: 1px solid rgba(var(--gray-light), 1);
+		border-bottom: 1px solid var(--chrome-divider);
 		background: transparent;
 	}
 	.inner {
@@ -33,7 +50,7 @@ const isBlogActive = pathname === '/blog' || pathname.startsWith('/blog/');
 		display: inline-flex;
 		align-items: baseline;
 		text-decoration: none;
-		color: rgb(var(--black));
+		color: var(--heading);
 		transition: opacity 0.15s ease;
 	}
 	.brand:hover {
@@ -48,14 +65,68 @@ const isBlogActive = pathname === '/blog' || pathname.startsWith('/blog/');
 	}
 	.nav {
 		display: flex;
+		align-items: center;
 		gap: 1.5rem;
+	}
+	.theme-toggle {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		width: 1.75rem;
+		height: 1.75rem;
+		padding: 0;
+		margin: -0.3rem 0;
+		border: none;
+		background: none;
+		color: var(--secondary-text);
+		cursor: pointer;
+		border-radius: 4px;
+		transition: color 0.15s ease;
+	}
+	.theme-toggle:hover {
+		color: var(--heading);
+	}
+	.theme-toggle:focus-visible {
+		outline: 2px solid var(--link);
+		outline-offset: 2px;
+	}
+	.icon {
+		width: 1.05rem;
+		height: 1.05rem;
+		fill: none;
+		stroke: currentColor;
+		stroke-width: 1.6;
+		stroke-linecap: round;
+		stroke-linejoin: round;
+	}
+	/* 显示「点了会变成什么」：浅色下给月亮，深色下给太阳。默认（跟随系统）
+	   两种情况都要覆盖，所以浅/深各写一遍，不能只写媒体查询。 */
+	.icon-sun {
+		display: none;
+	}
+	.icon-moon {
+		display: block;
+	}
+	:global(:root[data-theme='dark']) .icon-sun {
+		display: block;
+	}
+	:global(:root[data-theme='dark']) .icon-moon {
+		display: none;
+	}
+	@media (prefers-color-scheme: dark) {
+		:global(:root:not([data-theme='light'])) .icon-sun {
+			display: block;
+		}
+		:global(:root:not([data-theme='light'])) .icon-moon {
+			display: none;
+		}
 	}
 	.nav-link {
 		position: relative;
 		font-family: var(--font-mono);
 		font-size: 0.9rem;
 		font-weight: 500;
-		color: rgb(var(--gray));
+		color: var(--secondary-text);
 		text-decoration: none;
 		padding: 0.15em 0;
 		line-height: 1;
@@ -74,14 +145,14 @@ const isBlogActive = pathname === '/blog' || pathname.startsWith('/blog/');
 		transition: transform 0.2s ease;
 	}
 	.nav-link:hover {
-		color: rgb(var(--black));
+		color: var(--heading);
 	}
 	.nav-link:hover::after,
 	.nav-link.active::after {
 		transform: scaleX(1);
 	}
 	.nav-link.active {
-		color: rgb(var(--black));
+		color: var(--heading);
 	}
 	@media (max-width: 720px) {
 		.inner {
@@ -95,3 +166,21 @@ const isBlogActive = pathname === '/blog' || pathname.startsWith('/blog/');
 		}
 	}
 </style>
+
+<script>
+	const toggle = document.getElementById('theme-toggle');
+	toggle?.addEventListener('click', () => {
+		const root = document.documentElement;
+		// 当前是深色吗？没有显式选择时要问系统。
+		const isDark = root.dataset.theme
+			? root.dataset.theme === 'dark'
+			: window.matchMedia('(prefers-color-scheme: dark)').matches;
+		const next = isDark ? 'light' : 'dark';
+		root.dataset.theme = next;
+		try {
+			localStorage.setItem('theme', next);
+		} catch (e) {
+			/* 隐私模式下写不进去，本次访问内仍然生效 */
+		}
+	});
+</script>

@@ -57,7 +57,7 @@ const posts = (await getCollection('blog')).sort(
 	}
 	.posts li {
 		padding: 0.6rem 0;
-		border-bottom: 1px solid rgba(var(--gray-light), 1);
+		border-bottom: 1px solid var(--rule);
 	}
 	.posts li:last-child {
 		border-bottom: none;
@@ -68,20 +68,20 @@ const posts = (await getCollection('blog')).sort(
 		align-items: baseline;
 		gap: 1rem;
 		text-decoration: none;
-		color: rgb(var(--black));
+		color: var(--heading);
 	}
 	.posts li a:hover .title {
-		color: rgb(var(--accent));
+		color: rgb(var(--link));
 	}
 	.posts li a :global(time) {
-		color: rgb(var(--gray));
+		color: var(--secondary-text);
 		font-size: 0.9em;
 		white-space: nowrap;
 	}
 	.empty {
 		margin: 0;
 		font-size: 0.85rem;
-		color: rgba(var(--black), 0.4);
+		color: var(--secondary-text);
 	}
 	@media (max-width: 720px) {
 		.posts li a {
