@@ -11,7 +11,7 @@ Astro 静态博客，部署在 Vercel，域名 hexup.cc。
 
 ## 项目结构
 
-- `src/pages/` — 路由页面（`index.astro` 首页 = 介绍 + 文章列表，`about.astro`，`blog/index.astro`，`rss.xml.js`）
+- `src/pages/` — 路由页面（`index.astro` 首页 = 文章列表，`blog/index.astro`，`rss.xml.js`）
 - `src/content/blog/` — 文章源文件，`.md` 或 `.mdx`，frontmatter schema 见 `src/content.config.ts`
 - `src/components/` — `Header` `Footer` `BaseHead` `FormattedDate`
 - `src/layouts/BlogPost.astro` — 单篇文章布局
