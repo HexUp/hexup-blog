@@ -202,3 +202,28 @@ code {
 		-webkit-hyphens: none;
 	}
 }
+
+/* ---------------------------------------------------------------------------
+   4. 中西文间距与标点压缩
+
+   两者都由 src/plugins/rehype-cjk-typography.mjs 在构建期插入空 span 实现，
+   markdown 源文件不受影响。宽度写在 --tl-em 里（正数是间距，负数是压缩），
+   改数值去改插件里的常量，不要改这里。
+
+   为什么不用原生 CSS，插件顶部的注释里有实测数据。简短版：text-autospace 只给
+   0.125em（Telari 要 0.25em）且 Safari/Firefox 没有；text-spacing-trim 依赖
+   字体的 chws 特性，而 Songti SC 恰好没有，实测完全不生效。
+--------------------------------------------------------------------------- */
+
+.tl-gap,
+.tl-punct-trim {
+	/* 空元素，只贡献一段（可为负的）水平推进。 */
+	margin-inline-start: calc(var(--tl-em) * 1em);
+}
+
+/* Telari 的 hanging_punctuation 默认开启。Safari 支持，Chrome 目前不支持——
+   支持的浏览器多得一点，不支持的也不会更差。 */
+.prose p,
+.prose li {
+	hanging-punctuation: allow-end;
+}

@@ -3,11 +3,16 @@
 import mdx from '@astrojs/mdx';
 import sitemap from '@astrojs/sitemap';
 import { defineConfig, fontProviders } from 'astro/config';
+import rehypeCjkTypography from './src/plugins/rehype-cjk-typography.mjs';
 
 // https://astro.build/config
 export default defineConfig({
 	site: 'https://hexup.cc',
 	integrations: [mdx(), sitemap()],
+	// 构建期中西文间距与中文标点压缩。mdx() 默认继承 markdown 配置。
+	markdown: {
+		rehypePlugins: [rehypeCjkTypography],
+	},
 	fonts: [
 		{
 			provider: fontProviders.local(),
