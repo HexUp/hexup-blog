@@ -19,12 +19,8 @@ const posts = (await getCollection('blog')).sort(
 	<body>
 		<Header />
 		<main>
-			<section class="intro">
-				<h1>你好，我是 HexUp</h1>
-				<p>浙大博士，B 站 HexUp。这里是我的博客站。</p>
-			</section>
 			<section class="posts">
-				<h2>文章</h2>
+				<h1>文章</h1>
 				{
 					posts.length === 0 ? (
 						<p class="empty">暂无文章。</p>
@@ -47,23 +43,12 @@ const posts = (await getCollection('blog')).sort(
 	</body>
 </html>
 <style>
-	.intro {
-		margin-bottom: 2.5rem;
-	}
-	.intro h1 {
-		margin: 0 0 0.5rem 0;
+	.posts h1 {
+		margin: 0 0 1.5rem 0;
 		font-size: 1.875rem;
 		font-weight: 700;
 		letter-spacing: -0.01em;
 		line-height: 1.25;
-	}
-	.intro p {
-		margin: 0;
-		color: rgb(var(--gray-dark));
-	}
-	.posts h2 {
-		margin: 0 0 1rem 0;
-		font-size: 1.25rem;
 	}
 	.posts ul {
 		list-style: none;
