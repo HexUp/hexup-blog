@@ -38,9 +38,11 @@ const isBlogActive = pathname === '/blog' || pathname.startsWith('/blog/');
 		background: transparent;
 	}
 	.inner {
+		/* 与 main 同一套盒模型和留白，品牌名才会和正文左边缘对齐。 */
+		box-sizing: border-box;
 		max-width: 720px;
 		margin: 0 auto;
-		padding: 1.25rem 1rem;
+		padding: 1.25rem var(--page-inset);
 		display: flex;
 		align-items: baseline;
 		justify-content: space-between;
@@ -156,7 +158,7 @@ const isBlogActive = pathname === '/blog' || pathname.startsWith('/blog/');
 	}
 	@media (max-width: 720px) {
 		.inner {
-			padding: 1rem 1rem;
+			padding: 1rem var(--page-inset);
 		}
 		.brand-mark {
 			font-size: 1rem;

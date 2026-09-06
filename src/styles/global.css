@@ -8,6 +8,10 @@
 	/* 配色见 palette.css（Telari Light / Telari Dark 逐槽照抄）。这里不再定义
 	   任何颜色——Bear Blog 原本那套 --accent / --gray-* 灰阶已全部移除。 */
 
+	/* 正文两侧留白。手机上这一个值就是文字到屏幕边缘的全部距离——所有排版容器
+	   都用 border-box + 这一个变量，不再层层叠加内缩。 */
+	--page-inset: 1rem;
+
 	/* Never synthesize italic. Browser-skewed Chinese characters (slanted
 	   verticals) look amateur. A real italic face — if loaded — still works,
 	   including a properly designed Chinese italic that keeps verticals upright. */
@@ -26,10 +30,13 @@ body {
 	font-size: 20px;
 }
 main {
+	/* border-box：720 是**含留白的总宽**，正文列因此和页眉页脚精确对齐，
+	   手机上也不会出现「容器内缩一层、内容再内缩一层」。 */
+	box-sizing: border-box;
 	width: 720px;
-	max-width: calc(100% - 2em);
+	max-width: 100%;
 	margin: auto;
-	padding: 3em 1em;
+	padding: 3em var(--page-inset);
 }
 /* 标题的尺寸、字重、上下留白见 typography.css（Telari 的 heading_scale /
    heading_weight / heading_space_*）。这里只管颜色。 */
@@ -104,7 +111,7 @@ hr {
 		font-size: 18px;
 	}
 	main {
-		padding: 1em;
+		padding: 1.5em var(--page-inset);
 	}
 }
 

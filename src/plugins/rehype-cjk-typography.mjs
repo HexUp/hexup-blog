@@ -44,6 +44,16 @@ const PUNCT_TRIM_EM = 0.5;
 /** style.rs `Typeset::default()` 的 `cjk_latin_gap`。 */
 const CJK_LATIN_GAP_EM = 0.25;
 
+/** 给多长的拉丁词标 lang="en"。整页是 lang="zh-CN"，浏览器不会对中文文档里的
+ *  英文启用连字词典，长单词放不下就只能把上一行撑开——正是 Knuth-Plass 存在的
+ *  理由，而 CSS 的贪心断行器没有全局视野，只能靠连字缓解。
+ *
+ *  阈值和 typography.css 里的 `hyphenate-limit-chars: 8 4 4` 对齐：只有 8 个
+ *  字母以上的词才可能被断开，所以短于 8 的词包了也没用，白白多出一堆 span。
+ *  这同时避开了「Telari」（6）这类产品名被断成 Tel-ari。 */
+const LATIN_WORD_MIN = 8;
+const LATIN_WORD = /[A-Za-zÀ-ɏ]{8,}/g;
+
 /** 不进入的子树。math 交给未来的公式渲染，别在里面塞 span。 */
 const SKIP = new Set(['script', 'style', 'math', 'svg', 'textarea']);
 /** 进入、但内部不插接缝的子树：里面的字符仍参与边界判定，且按 items.rs
@@ -94,10 +104,58 @@ function gapNode(cls, em) {
 }
 
 /**
+ * 给块里够长的拉丁词套上 <span lang="en">，让 hyphens: auto 生效。
+ *
+ * 必须在接缝那一趟之前跑：接缝逻辑是重新收集文本节点的，跑完这里它看到的就是
+ * 拆分后的结构，落在 span 边界上的接缝走 atRunEnd 那条路，本来就处理得了。
+ */
+function wrapLatinWords(block) {
+	(function walk(node, code) {
+		const children = node.children;
+		if (!children) return;
+		for (let i = 0; i < children.length; i++) {
+			const child = children[i];
+			if (child.type === 'element') {
+				if (SKIP.has(child.tagName) || BLOCK.has(child.tagName)) continue;
+				// 代码里的英文不参与连字：代码不该被断开。
+				walk(child, code || CODE.has(child.tagName));
+				continue;
+			}
+			if (child.type !== 'text' || code) continue;
+
+			LATIN_WORD.lastIndex = 0;
+			const value = child.value;
+			if (!LATIN_WORD.test(value)) continue;
+			LATIN_WORD.lastIndex = 0;
+
+			const out = [];
+			let cursor = 0;
+			let m;
+			while ((m = LATIN_WORD.exec(value)) !== null) {
+				if (m.index > cursor) out.push({ type: 'text', value: value.slice(cursor, m.index) });
+				out.push({
+					type: 'element',
+					tagName: 'span',
+					properties: { lang: 'en' },
+					children: [{ type: 'text', value: m[0] }],
+				});
+				cursor = m.index + m[0].length;
+			}
+			if (cursor < value.length) out.push({ type: 'text', value: value.slice(cursor) });
+
+			children.splice(i, 1, ...out);
+			i += out.length - 1;
+		}
+	})(block, CODE.has(block.tagName));
+}
+
+/**
  * 把一个块里的所有文本节点收集成一条字符流（代码子树也进，但打上 code 标记），
  * 再在需要的接缝上插入空 span。
  */
 function processBlock(block) {
+	wrapLatinWords(block);
+
 	/** @type {{node: any, siblings: any[], code: boolean}[]} */
 	const runs = [];
 

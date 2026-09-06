@@ -10,10 +10,12 @@ const today = new Date();
 <style>
 	footer {
 		margin-top: 4rem;
-		padding: 2.5rem 1rem;
+		padding: 2.5rem var(--page-inset);
 		border-top: 1px solid var(--chrome-divider);
 	}
 	.inner {
+		/* 与 main 同一套盒模型和留白，品牌名才会和正文左边缘对齐。 */
+		box-sizing: border-box;
 		max-width: 720px;
 		margin: 0 auto;
 		text-align: center;

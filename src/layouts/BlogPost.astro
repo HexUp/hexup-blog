@@ -15,10 +15,14 @@ const { title, description, pubDate, updatedDate, heroImage } = Astro.props;
 	<head>
 		<BaseHead title={title} description={description} />
 		<style>
+			/* 文章页由 .prose 独占内缩这一职责，main 只负责题图能通栏。
+			   两层都留白的话，手机上文字列会被挤掉近 20%。 */
 			main {
-				width: calc(100% - 2em);
+				width: 100%;
 				max-width: 100%;
 				margin: 0;
+				padding-left: 0;
+				padding-right: 0;
 			}
 			.hero-image {
 				width: 100%;
@@ -30,10 +34,11 @@ const { title, description, pubDate, updatedDate, heroImage } = Astro.props;
 				box-shadow: var(--shadow);
 			}
 			.prose {
+				box-sizing: border-box;
 				width: 720px;
-				max-width: calc(100% - 2em);
+				max-width: 100%;
 				margin: auto;
-				padding: 1em;
+				padding: 0 var(--page-inset);
 				color: var(--text);
 			}
 			.title {

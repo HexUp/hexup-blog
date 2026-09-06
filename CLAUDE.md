@@ -35,6 +35,16 @@ pubDate: 'YYYY-MM-DD'
 
 可选：`updatedDate`、`heroImage`（路径相对于 md 文件，例如 `../../assets/xxx.jpg`）。
 
+## 排版插件的坑
+
+`src/plugins/rehype-cjk-typography.mjs` 改完之后，**必须清缓存再构建**，否则看不到效果：
+
+```
+rm -rf node_modules/.astro .astro && npm run build
+```
+
+Astro 的 content layer 把渲染结果缓存在 `node_modules/.astro/data-store.json` 里，markdown 文件没变就不重新走 rehype 管线。改插件、只跑 `npm run build`，产物是旧的——这一点上踩过两次。
+
 ## 常用命令
 
 - `npm run dev` — 本地开发 (http://localhost:4321)

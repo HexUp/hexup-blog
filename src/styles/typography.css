@@ -205,6 +205,13 @@ code {
 	text-align: justify;
 	hyphens: auto;
 	-webkit-hyphens: auto;
+	/* 克制地用连字。Telari 那边靠 hyphenation_penalty = 50 与
+	   double_hyphen_penalty 让 K-P 尽量少断词；CSS 没有惩罚项，只能用这条硬
+	   限制近似：至少 8 个字母才断，断点两侧各留 4 个。插件里的 LATIN_WORD_MIN
+	   与这里的 8 是同一个数，改一处要改两处。 */
+	hyphenate-limit-chars: 8 4 4;
+	-webkit-hyphenate-limit-before: 4;
+	-webkit-hyphenate-limit-after: 4;
 }
 
 @media (max-width: 480px) {
