@@ -21,7 +21,7 @@
 	font-synthesis-style: none;
 }
 body {
-	font-family: var(--font-atkinson);
+	/* font-family / line-height 见 typography.css（Telari 的阅读字体栈与行高） */
 	margin: 0;
 	padding: 0;
 	text-align: left;
@@ -31,7 +31,6 @@ body {
 	overflow-wrap: break-word;
 	color: rgb(var(--gray-dark));
 	font-size: 20px;
-	line-height: 1.7;
 }
 main {
 	width: 720px;
@@ -39,34 +38,15 @@ main {
 	margin: auto;
 	padding: 3em 1em;
 }
+/* 标题的尺寸、字重、上下留白见 typography.css（Telari 的 heading_scale /
+   heading_weight / heading_space_*）。这里只管颜色。 */
 h1,
 h2,
 h3,
 h4,
 h5,
 h6 {
-	margin: 0 0 0.5rem 0;
 	color: rgb(var(--black));
-	line-height: 1.2;
-}
-/* Restrained type scale: largest ~1.875× body, each step ~1.25×.
-   Big enough to establish hierarchy, small enough that the page reads
-   as one document instead of a stack of billboards. */
-h1 {
-	font-size: 1.875rem;
-	letter-spacing: -0.01em;
-}
-h2 {
-	font-size: 1.5rem;
-}
-h3 {
-	font-size: 1.25rem;
-}
-h4 {
-	font-size: 1.125rem;
-}
-h5 {
-	font-size: 1rem;
 }
 strong,
 b {
@@ -78,12 +58,7 @@ a {
 a:hover {
 	color: var(--accent);
 }
-p {
-	margin-bottom: 1em;
-}
-.prose p {
-	margin-bottom: 2em;
-}
+/* 段距见 typography.css（Telari 的 para_space_between = 0.75em）。 */
 textarea {
 	width: 100%;
 	font-size: 16px;
@@ -100,7 +75,7 @@ img {
 	border-radius: 8px;
 }
 code {
-	padding: 2px 5px;
+	/* font-size / padding 见 typography.css（code 0.88 + code_capsule_pad） */
 	background-color: rgb(var(--gray-light));
 	border-radius: 2px;
 }
@@ -112,10 +87,12 @@ pre > code {
 	all: unset;
 }
 blockquote {
-	border-left: 4px solid var(--accent);
-	padding: 0 0 0 20px;
-	margin: 0;
-	font-size: 1.333em;
+	/* Telari 的 quoteIndent = 24，且引用不放大字号——放大会让引用比正文更抢眼，
+	   层级反了。层级靠缩进和颜色建立。 */
+	border-left: 3px solid rgb(var(--gray-light));
+	padding: 0 0 0 24px;
+	margin: 0 0 0.75em 0;
+	color: rgb(var(--gray));
 }
 hr {
 	border: none;

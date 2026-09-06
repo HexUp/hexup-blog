@@ -1,0 +1,204 @@
+/*
+  正文排版 — 尽量向 Telari 的排版决策靠拢。
+
+  数值来源是 telari 仓库里的两处默认值，不要凭感觉改：
+  - `core/src/style.rs` → `impl Default for Typeset`（行高、段距、标题级差与留白、
+    中西文间距、标点压缩、行内代码 capsule padding）
+  - `app/Sources/TelariKit/Theme.swift` → `FontRoles` / `Theme`（字体分工、
+    基准字号、正文栏宽）
+
+  浏览器拿不到的两件事，别再尝试：
+  1. Knuth-Plass 断行。CSS 的断行是贪心的，且断行点依赖视口宽度，静态站也无法预排。
+  2. `hanBaseline` 那档中西文基线微调。@font-face 没有对应描述符。
+*/
+
+/* ---------------------------------------------------------------------------
+   1. 字体分工
+
+   Telari 把字体拆成 han / latin / code 三个 role 分别选面，而不是给一整段文字
+   指定一个 family 然后听凭 fallback。这里用 unicode-range 做同一件事：拉丁字符
+   命中 --font-latin，汉字与中文标点落到 'Han'。
+
+   'Han' 全部走 local()——Songti SC / Kaiti SC / STSongti-SC-Black 都是 macOS
+   系统字体，Mac 访客零流量拿到和 Telari 一致的字面，非 Mac 访客落到 serif
+   fallback。不打包 web 字体：一套中文字体动辄数 MB，不值得。
+
+   size-adjust（对应 Telari 的 hanScale / latinScale）此处不设，与 Telari 默认
+   值 1.0 一致。若日后要做中西文视觉大小校准，加在下面的 @font-face 上。
+--------------------------------------------------------------------------- */
+
+/* 汉字、假名、中文标点、全角形式。--font-latin 覆盖不到的都在这里。 */
+@font-face {
+	font-family: 'Han';
+	font-style: normal;
+	font-weight: 400;
+	src: local('Songti SC'), local('STSongti-SC-Regular');
+	unicode-range:
+		U+2E80-2EFF, U+2F00-2FDF, U+3000-303F, U+3040-30FF, U+3100-312F, U+3190-319F,
+		U+31C0-31EF, U+3200-33FF, U+3400-4DBF, U+4E00-9FFF, U+F900-FAFF, U+FE10-FE1F,
+		U+FE30-FE4F, U+FF00-FFEF, U+20000-2A6DF;
+}
+
+/* strong：换特黑面，不是合成粗体。对应 FaceTable 的 CjkStrongFace.black
+   （STSongti-SC-Black）——STSongti-SC-Bold 只是半步面，中文里分量不够。 */
+@font-face {
+	font-family: 'Han';
+	font-style: normal;
+	font-weight: 700;
+	src: local('STSongti-SC-Black'), local('Songti SC Black'), local('Songti SC');
+	unicode-range:
+		U+2E80-2EFF, U+2F00-2FDF, U+3000-303F, U+3040-30FF, U+3100-312F, U+3190-319F,
+		U+31C0-31EF, U+3200-33FF, U+3400-4DBF, U+4E00-9FFF, U+F900-FAFF, U+FE10-FE1F,
+		U+FE30-FE4F, U+FF00-FFEF, U+20000-2A6DF;
+}
+
+/* em：换楷体，不是把宋体机械倾斜。对应 FaceTable 的 CjkItalicFace.kai。
+
+   这是 CLAUDE.md 那条「中文严禁合成斜体」的正解，而不是它的例外：楷体是竖线
+   垂直的独立字面，浏览器不做任何倾斜变换。把它注册在 font-style: italic 下，
+   `<em>` 的默认 italic 就落到这张脸上，同一个 em 里的拉丁字符仍走 --font-latin
+   的真斜体。没有楷体的系统上匹配失败 → 回落到 normal 面，而 global.css 的
+   font-synthesis-style: none 保证此时也不会合成——最坏情况是没有区别，不会变丑。
+
+   ⚠️ 楷体在现代 macOS 上不是预装字体（本机 /System/Library/Fonts/Supplemental
+   下就没有 Kaiti.ttc，需要用户从「字体册」下载）。所以这条规则在相当一部分 Mac
+   上会静默失效，退化成「中文 em 无视觉区别」。要让它稳定生效，只能在构建期把一款
+   楷体按文章实际用到的字符子集化后打包——放在第 3 步和 rehype 插件一起做。 */
+@font-face {
+	font-family: 'Han';
+	font-style: italic;
+	font-weight: 400;
+	src:
+		local('Kaiti SC'), local('STKaiti'), local('Kaiti TC'), local('STKaiti-TC-Regular'),
+		local('KaiTi'), local('BiauKai'), local('DFKai-SB'), local('LXGW WenKai'),
+		local('LXGWWenKai-Regular');
+	unicode-range:
+		U+2E80-2EFF, U+2F00-2FDF, U+3000-303F, U+3040-30FF, U+3100-312F, U+3190-319F,
+		U+31C0-31EF, U+3200-33FF, U+3400-4DBF, U+4E00-9FFF, U+F900-FAFF, U+FE10-FE1F,
+		U+FE30-FE4F, U+FF00-FFEF, U+20000-2A6DF;
+}
+
+@font-face {
+	font-family: 'Han';
+	font-style: italic;
+	font-weight: 700;
+	src:
+		local('Kaiti SC Bold'), local('STKaiti-SC-Bold'), local('Kaiti SC'), local('STKaiti'),
+		local('LXGW WenKai Bold'), local('LXGW WenKai');
+	unicode-range:
+		U+2E80-2EFF, U+2F00-2FDF, U+3000-303F, U+3040-30FF, U+3100-312F, U+3190-319F,
+		U+31C0-31EF, U+3200-33FF, U+3400-4DBF, U+4E00-9FFF, U+F900-FAFF, U+FE10-FE1F,
+		U+FE30-FE4F, U+FF00-FFEF, U+20000-2A6DF;
+}
+
+:root {
+	/* Telari 的 latin role 默认是系统衬线体，即 macOS 的 New York。ui-serif 在
+	   Apple 平台上解析到的正是它。 */
+	--font-latin: ui-serif, 'New York', Iowan Old Style, Georgia, serif;
+	/* 阅读字体栈：拉丁在前，'Han' 只接管它覆盖不到的码位。 */
+	--font-reading: var(--font-latin), 'Han', serif;
+
+	/* core/src/style.rs `Typeset::default()` */
+	--tl-line-spacing: 1.6;
+	--tl-para-space: 0.75em;
+	--tl-heading-space-before: 0.8em;
+	--tl-heading-space-after: 0.4em;
+	--tl-code-scale: 0.88; /* Theme.swift FontRoles 里 code 的固有 0.88 */
+	--tl-code-pad: 0.2em; /* code_capsule_pad */
+}
+
+/* ---------------------------------------------------------------------------
+   2. 正文度量
+
+   站点 chrome（Header / Footer）继续用 --font-mono，不受影响——对应 Telari 里
+   AppKit chrome 与文档正文分属两套字体的分工。
+--------------------------------------------------------------------------- */
+
+body {
+	font-family: var(--font-reading);
+	line-height: var(--tl-line-spacing);
+}
+
+p {
+	margin-top: 0;
+	margin-bottom: var(--tl-para-space);
+}
+
+/* Bear Blog 原本给文章正文 2em 段距，是 Telari 的 2.7 倍，段落之间散成一块块。 */
+.prose p {
+	margin-bottom: var(--tl-para-space);
+}
+
+/* heading_scale [1.6, 1.5, 1.4, 1.3, 1.2, 1.1] + heading_weight 全 Semibold。
+   用 em 而非 rem：Telari 的级差是相对正文字号的倍数，而正文是 20px、root 是
+   16px，写 rem 会算错。 */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+	font-weight: 600;
+	margin: var(--tl-heading-space-before) 0 var(--tl-heading-space-after) 0;
+	line-height: 1.25;
+	text-wrap: pretty;
+}
+h1 {
+	font-size: 1.6em;
+	letter-spacing: -0.01em;
+}
+h2 {
+	font-size: 1.5em;
+}
+h3 {
+	font-size: 1.4em;
+}
+h4 {
+	font-size: 1.3em;
+}
+h5 {
+	font-size: 1.2em;
+}
+h6 {
+	font-size: 1.1em;
+}
+
+/* 一段内容的第一个标题不需要上留白，上面已经有块间距了。 */
+.prose > :first-child,
+main > section > h1:first-child {
+	margin-top: 0;
+}
+
+code {
+	font-family: var(--font-mono);
+	font-size: calc(1em * var(--tl-code-scale));
+	padding: 0 var(--tl-code-pad);
+}
+
+/* ---------------------------------------------------------------------------
+   3. 两端对齐
+
+   中文段落是浏览器两端对齐表现最好的场景：汉字处处可断，行末伸缩幅度天然很小。
+   丑的是拉丁长单词撑开词距，所以配 hyphens: auto。
+
+   窄栏退化对应 core 的 auto_ragged_narrow / auto_ragged_measure_em（一行装不下
+   12 个字就放弃两端对齐）。这里的阈值比 12 字保守得多：Telari 那个阈值是给
+   Knuth-Plass 定的，而贪心断行器在窄栏里劣化得早得多，同样的字数下已经会拉出
+   难看的词距。CSS 也无法直接测「一行几个字」，只能用视口宽度近似。
+--------------------------------------------------------------------------- */
+
+.prose p,
+.prose li {
+	text-align: justify;
+	hyphens: auto;
+	-webkit-hyphens: auto;
+}
+
+@media (max-width: 480px) {
+	.prose p,
+	.prose li {
+		text-align: left;
+		hyphens: none;
+		-webkit-hyphens: none;
+	}
+}

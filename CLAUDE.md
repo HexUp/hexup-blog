@@ -7,7 +7,8 @@ Astro 静态博客，部署在 Vercel，域名 hexup.cc。
 - **品牌名 `HexUp`**：所有面向用户展示的地方一律用这个大小写（不要写成 hexup / HEXUP / Hexup）。代码里的标识符、文件名、URL slug 不受此限。
 - **导航栏**：左侧 `HexUp` 主页按钮，右侧 `Blog` 链接（当前页是 `/blog` 或 `/blog/*` 时高亮）。不要加 Home / About / 社交图标等其他项。
 - **语言**：页面文案中英混排，HTML `lang="zh-CN"`。
-- **中文严禁合成斜体**（浏览器把直立汉字机械倾斜，竖线变斜，非常难看）。global.css 已用 `font-synthesis-style: none` 全局禁止合成。**不要**手写 `font-style: italic` 在可能含中文的元素上；用更轻字重、低对比颜色、字号差异等方式建立层级。如果将来确实要中文斜体，必须加载一款专门设计、能保持竖线垂直的中文斜体字，再显式应用。
+- **中文严禁合成斜体**（浏览器把直立汉字机械倾斜，竖线变斜，非常难看）。global.css 已用 `font-synthesis-style: none` 全局禁止合成。**不要**手写 `font-style: italic` 在可能含中文的元素上；用更轻字重、低对比颜色、字号差异等方式建立层级。文章正文里的 `<em>` 已在 `typography.css` 里换成楷体（Telari 的 `CjkItalicFace.kai` 同款做法，楷体竖线本身垂直，不是倾斜变换）——但楷体在现代 macOS 上不预装，没装的机器会退化成「无区别」。
+- **排版参数以 telari 仓库为准**：`src/styles/typography.css` 里的行高、段距、标题级差与留白、行内代码尺寸等，全部抄自 `~/projects/telari` 的 `core/src/style.rs`（`Typeset::default()`）和 `app/Sources/TelariKit/Theme.swift`。改这些数值前先回去看源头，不要凭感觉调。
 
 ## 项目结构
 

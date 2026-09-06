@@ -11,7 +11,7 @@ type Props = CollectionEntry<'blog'>['data'];
 const { title, description, pubDate, updatedDate, heroImage } = Astro.props;
 ---
 
-<html lang="en">
+<html lang="zh-CN">
 	<head>
 		<BaseHead title={title} description={description} />
 		<style>
@@ -43,14 +43,16 @@ const { title, description, pubDate, updatedDate, heroImage } = Astro.props;
 				line-height: 1;
 			}
 			.title h1 {
+				font-size: 1.6em;
 				margin: 0 0 0.5em 0;
 			}
 			.date {
 				margin-bottom: 0.5em;
 				color: rgb(var(--gray));
 			}
+			/* 不用 font-style: italic——见 CLAUDE.md。层级靠颜色和字号。 */
 			.last-updated-on {
-				font-style: italic;
+				font-size: 0.9em;
 			}
 		</style>
 	</head>
